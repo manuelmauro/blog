@@ -27,6 +27,8 @@ url: "/" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  manuelmauro
 
 # Build settings
+markdown: kramdown
+exclude: ["README.md"]
 theme: minima
 plugins:
   - jekyll-feed
