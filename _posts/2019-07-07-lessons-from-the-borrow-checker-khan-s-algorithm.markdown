@@ -17,7 +17,8 @@ When this process stops, if the graph has no more arcs, you have a topological s
 
 The algorithm is pretty straightforward but the data on which it operates, the graph, is complex enough for the borrow checker to give us a small lesson.
 
-# The Code
+## The Code
+
 First of all, we need a way to represent our graph. Notice that Khan's algorithm makes use of the following operations:
 
 - Check if a node has no incoming arcs
@@ -89,15 +90,19 @@ while let Some(source) = source_nodes.pop_front() {
 ```
 
 As you can see we use our graph in three different lines. First we cycle on the outgoing neighbors of our current source
+
 ```rust
 graph.get(&source).unwrap().outg.clone()
 ```
+
 secondly we get the incoming arcs of this neighbor in order to remove the one from the source
+
 ```rust
 &mut graph.get_mut(&neighbor).unwrap().inc
 ```
 
 thirdly if the removal of such an arc makes the neighbor a new source we add it to our list of source nodes
+
 ```rust
 graph.get(&neighbor).unwrap().inc.is_empty()
 ```
@@ -127,7 +132,7 @@ What if instead we opted for something like the following?
 ``` rust
 let mut inc_graph: HashMap<char, Vec<char>> = HashMap::new();
 let mut outg_graph: HashMap<char, Vec<char>> = HashMap::new();
-```    
+```
 
 Two different and well separated graphs representing incoming and outgoing arcs. For which inserting a node from our example looks like this
 
@@ -175,11 +180,10 @@ Furthermore the new structure could be even friendlier on the cache (but this st
 
 Source code: [clone() version][first-version] and [final version][final-version].
 
-
 [topo-sort]: https://en.wikipedia.org/wiki/Topological_sorting
 [dag]: https://en.wikipedia.org/wiki/Directed_acyclic_graph
 [khan-algo]: https://dl.acm.org/citation.cfm?doid=368996.369025
 [nll]: https://doc.rust-lang.org/stable/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html
 [dod]: https://en.wikipedia.org/wiki/Data-oriented_design
-[first-version]: https://gitlab.com/snippets/1881175
-[final-version]: https://gitlab.com/snippets/1881177
+[first-version]: https://gist.github.com/manuelmauro/be8c74c6949bebb96cc3e293a3bd4d2f
+[final-version]: https://gist.github.com/manuelmauro/43735f70247e659199061310dd4481d7
