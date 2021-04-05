@@ -1,9 +1,10 @@
 ---
 layout: post
-title:  "Lessons From the Borrow Checker: Khan's Algorithm"
-date:   2019-07-07
+title: "Lessons From the Borrow Checker: Khan's Algorithm"
+date: 2019-07-07
 categories: Lessons From the Borrow Checker
 ---
+
 During a coding interview I was asked to write an algorithm for the problem of [topologically ordering][topo-sort] the nodes of a certain [directed acyclic graph][dag] that the interviewer drew on the whiteboard (see Figure).
 Since in the last year I learned Rust and I have been using it for all my personal projects, I decided to go for it.
 Needless to say that the borrow checker is not your friend during an interview. In any case I came home with a few lessons.
@@ -27,7 +28,7 @@ First of all, we need a way to represent our graph. Notice that Khan's algorithm
 
 An adjacency list containing both incoming and outgoing arcs, seems to work well enough for all the above operations. A quick way to implement this, using only the standard library, is an hash map and a custom `struct` as follows:
 
-``` rust
+```rust
 struct Neighbors {
     inc: Vec<char>,
     outg: Vec<char>,
@@ -42,7 +43,7 @@ Notice that we are using chars only because the interviewer example made use of 
 
 With such a kind of data structure, in order to build the graph in Figure we need a series of insertions like the following one:
 
-``` rust
+```rust
 graph.insert(
     'a',
     Neighbors {
@@ -54,7 +55,7 @@ graph.insert(
 
 We are now ready for the first step of Khan's algorithm, that is finding the sources nodes and adding them to a queue in order to use them afterwords.
 
-``` rust
+```rust
 let mut source_nodes: VecDeque<char> = VecDeque::new();
 
 for (&node, neighbors) in &graph {
@@ -67,7 +68,7 @@ for (&node, neighbors) in &graph {
 
 Not much to say about the previous snippet and , up to this point, no big deal with the borrow checker. Let's enter the crux of the algorithm.
 
-``` rust
+```rust
 while let Some(source) = source_nodes.pop_front() {
     // add the node to the topological sort
     topo_sort.push(source);
@@ -111,10 +112,10 @@ In the third case [non-lexical lifetimes][nll] come to the rescue. In the second
 But this does not feel right, if you think of it, the first occurrence is considering only outgoing neighbors while the second one only incoming ones, and since we are using chars as labels and copying them around, these information are logically separated and it is safe to work on both of them.
 This could remind us of the case in which we want to access at the same time two different indices of a slice and the borrow checker does not allow us to, thus forcing us to use some `unsafe` code and the `split_at` function. But in this case the workaround looks harder to implement (if possible).
 
-Here it comes the *lesson from the borrow checker*. Unexpectedly, the lesson I got from this exercise is not about `unsafe` Rust but about [data-oriented design][dod].
+Here it comes the _lesson from the borrow checker_. Unexpectedly, the lesson I got from this exercise is not about `unsafe` Rust but about [data-oriented design][dod].
 Think of where we started, that is of our definition of a graph.
 
-``` rust
+```rust
 struct Neighbors {
     inc: Vec<char>,
     outg: Vec<char>,
@@ -129,21 +130,21 @@ It looked simply reasonable to have a struct for the `Neighbors` of a certain no
 
 What if instead we opted for something like the following?
 
-``` rust
+```rust
 let mut inc_graph: HashMap<char, Vec<char>> = HashMap::new();
 let mut outg_graph: HashMap<char, Vec<char>> = HashMap::new();
 ```
 
 Two different and well separated graphs representing incoming and outgoing arcs. For which inserting a node from our example looks like this
 
-``` rust
+```rust
 inc_graph.insert('a', vec![]);
 outg_graph.insert('a', vec!['c', 'b']);
 ```
 
 The first part of the algorithm is very similar
 
-``` rust
+```rust
 let mut topo_sort: Vec<char> = vec![];
 let mut source_nodes: VecDeque<char> = VecDeque::new();
 
@@ -156,7 +157,7 @@ for (&node, inc_neighbors) in &inc_graph {
 
 The second part though can be modified as following:
 
-``` rust
+```rust
 while let Some(source) = source_nodes.pop_front() {
     topo_sort.push(source);
 
