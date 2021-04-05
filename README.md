@@ -30,6 +30,7 @@ gem install jekyll bundler
 That’s it! You’re ready to start using Jekyll.
 
 ## Build
+
 Build the site and make it available on a local server.
 
 ```bash
