@@ -53,8 +53,8 @@ The sandbox also creates its own private network `sandnet-v1` with a list of acc
 ## Introducing Algonaut: an Algorand SDK Written in Rust
 
 [`algonaut`](https://github.com/manuelmauro/algonaut) is a community SDK and contributions are always welcome! Please feel free to open issues or send pull requests on the project's GitHub page.
-Speaking of GitHub, let's head to the [repository](https://github.com/manuelmauro/algonaut) and clone it. We will send a transaction on the private Algorand network kindly offered by our sandbox.
 
+Now it's time to send a transaction on the private Algorand network kindly offered by our sandbox.
 If your sandbox is running and you found the list of accounts with a positive balance in your wallet we are ready to go.
 
 First, create a new project with:
